@@ -1,0 +1,370 @@
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.0/jquery.cookie.min.js"></script>
+<style>
+  table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  th {
+    background-color: #eee;
+  }
+  th.sunday {
+    background-color: #fee;
+    color: #b00;
+  }
+  th.saturday {
+    background-color: #eef;
+    color: #00b;
+  }
+  td div {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  hr {
+    margin: 0;
+    border-style: dashed;
+  }
+  div.date {
+    padding-bottom: 5px;
+    font-weight: bold;
+  }
+  div.full {
+    background-color: #eee;
+  }
+  span.info {
+    font-size: 90%;
+    color: #666;
+  }
+  span.term {
+    font-size: 80%;
+    color: #999;
+  }
+  td.sunday div.date {
+    color: #b00;
+  }
+  td.saturday div.date {
+    color: #00b;
+  }
+  td.today {
+    background-color: #efe;
+  }
+  div.event {
+    padding: 1px 0px 2px 3px;
+  }
+  a.small {
+    font-size: small;
+  }
+  div.alert {
+    margin: 0 10px 20px 10px;
+  }
+  input[type="checkbox"] {
+    margin-left: 5px;
+  }
+  select {
+    margin-left: 5px;
+  }
+  .table {
+    margin-bottom: 0px;
+  }
+  #option-menu a {
+    font-size: small;
+    cursor: pointer;
+  }
+  #filter-form {
+    margin-left: 15px;
+  }
+  #last-update {
+    text-align: right;
+    font-size: x-small;
+    
+  }
+</style>
+<script>
+  function refresh() {
+    window.location.reload();
+  }
+  $(function(){
+    $("#link-monday-off").click(function(){ $.removeCookie('m');  refresh() });
+    $("#link-monday-on").click(function(){  $.cookie('m', 1);     refresh() });
+    $("#link-filter").click(function(){
+      var area = new Array()
+      <% @area_name.each do |a, n| %>
+      if ($('#a' + <%= a %>).is(':checked')) area.push(<%= a %>);
+      <% end %>
+      $.cookie('a' + <%= @area_category %>, area.join(','));
+
+      var site = new Array();
+      <% @site_name.each do |s, n| %>
+      if ($('#s' + <%= s %>).is(':checked')) site.push(<%= s %>);
+      <% end %>
+      $.cookie('s', site.join(','));
+
+      $.cookie('c', $('#select-count').val());
+      $.cookie('l', $('#select-limit').val());
+      $.cookie('f', ($('#checkbox-full').is(':checked')) ? 1 : 0);
+
+      refresh();
+    })
+    $.get('<%= url_for :controller => :sample, :action => :update_cache %>', {}, function(data){
+      //alert(data['msg']);
+    });
+  });
+</script>
+<nav class="navbar navbar-inverse navbar-static-top" role="navigation">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <span class="navbar-brand" style="color:#fff">itCal <small>(α)</small></span>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li<%= raw (@area_category == 1) ? ' class="active"' : '' %>>
+          <%= link_to '/hokkaido_tohoku' do %><small>北海道・東北</small><% end %>
+        </li>
+        <li<%= raw (@area_category == 2) ? ' class="active"' : '' %>>
+          <%= link_to '/' do %>関東<% end %>
+        </li>
+        <li<%= raw (@area_category == 3) ? ' class="active"' : '' %>>
+          <%= link_to '/chubu' do %>中部<% end %>
+        </li>
+        <li<%= raw (@area_category == 4) ? ' class="active"' : '' %>>
+          <%= link_to '/kansai' do %>関西<% end %>
+        </li>
+        <li<%= raw (@area_category == 5) ? ' class="active"' : '' %>>
+          <%= link_to '/chugoku_shikoku' do %><small>中国・四国</small><% end %>
+        </li>
+        <li<%= raw (@area_category == 6) ? ' class="active"' : '' %>>
+          <%= link_to '/kyushu_okinawa' do %><small>九州・沖縄</small><% end %>
+        </li>
+      </ul>
+
+      <ul class="nav navbar-nav navbar-right">
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+            <span class="glyphicon glyphicon-wrench"></span> <b class="caret"></b>
+          </a>
+          <ul id="option-menu" class="dropdown-menu">
+            <% ok_icon =' <span class="glyphicon glyphicon-ok"></span>' %>
+            <li><a id="link-monday-off">日曜始まり<%= raw (@option_monday) ? '' : ok_icon %></a></li>
+            <li><a id="link-monday-on" >月曜始まり<%= raw (@option_monday) ? ok_icon : '' %></a></li>
+          </ul>
+        </li>
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+<% @error_msg.each do |msg| %>
+  <div class="alert alert-danger"><%= msg %></div>
+<% end %>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <form id="filter-form" class="form-inline" role="form">
+      <label class="label label-default">地域</label>
+      <% @area_name.each do |a, n| %>
+        <% checked = (@option_areas[a]) ? 'checked' : '' %>
+        <label><input id="a<%= a %>" type="checkbox" <%= checked %>> <%= n %></label>
+      <% end %>
+      <br />
+
+      <%
+        icon = {}
+        @icons.each do |type, path|
+          icon[type] = image_tag path, {:width => 16, :height => 16, :class => 'icon'}
+        end
+      %>
+      <label class="label label-default">対象</label>
+      <% @site_name.each do |s, n| %>
+        <% checked = (@option_sites[s]) ? 'checked' : '' %>
+        <label><input id="s<%= s %>" type="checkbox" <%= checked %>> <%= icon[s] + ' ' + n %></label>
+      <% end %>
+      <br />
+
+      <label class="label label-default">参加</label>
+      <select id="select-count">
+        <option <%= (@option_count == 1) ? 'selected' : '' %> value="1">1人以上</option>
+        <option <%= (@option_count == 10) ? 'selected' : '' %> value="10">10人以上</option>
+        <option <%= (@option_count == 20) ? 'selected' : '' %> value="20">20人以上</option>
+        <option <%= (@option_count == 30) ? 'selected' : '' %> value="30">30人以上</option>
+        <option <%= (@option_count == 50) ? 'selected' : '' %> value="50">50人以上</option>
+        <option <%= (@option_count == 100) ? 'selected' : '' %> value="100">100人以上</option>
+      </select>
+      &nbsp;&nbsp;/&nbsp;&nbsp;
+      <label class="label label-default">定員</label>
+      <select id="select-limit">
+        <option <%= (@option_limit == 1) ? 'selected' : '' %> value="0">---</option>
+        <option <%= (@option_limit == 10) ? 'selected' : '' %> value="10">10人以上</option>
+        <option <%= (@option_limit == 20) ? 'selected' : '' %> value="20">20人以上</option>
+        <option <%= (@option_limit == 30) ? 'selected' : '' %> value="30">30人以上</option>
+        <option <%= (@option_limit == 50) ? 'selected' : '' %> value="50">50人以上</option>
+        <option <%= (@option_limit == 100) ? 'selected' : '' %> value="100">100人以上</option>
+      </select>
+      &nbsp;
+      <label>
+        <input id="checkbox-full" type="checkbox" <%= (@option_full) ? 'checked' : '' %>> 満員は除く
+      </label>
+      <br />
+
+      <button id="link-filter" type="button" class="btn btn-default btn-xs" style="margin-top: 8px;">　　絞り込み　　</button>
+    </form>
+  </div>
+  <div class="col-md-6">
+    <div style="font-size:small">
+      <b>information</b>
+      <hr>
+      2014/04/X alpha版作成<br />
+    </div>
+  </div>
+</div>
+
+<br />
+
+<table class="table table-bordered table-condensed">
+  <tr>
+    <% if not @option_monday then %>
+    <th class="sunday">日</th>
+    <th>月</th>
+    <th>火</th>
+    <th>水</th>
+    <th>木</th>
+    <th>金</th>
+    <th class="saturday">土</th>
+    <% else %>
+    <th>月</th>
+    <th>火</th>
+    <th>水</th>
+    <th>木</th>
+    <th>金</th>
+    <th class="saturday">土</th>
+    <th class="sunday">日</th>
+    <% end %>
+  </tr>
+  <%
+    if not @option_monday then
+      current_day = @start_day - @start_day.wday.days
+    else
+      wday = @start_day.wday
+      wday = 7 if wday == 0
+      current_day = @start_day - (wday - 1).days
+    end
+
+    wdays = []
+    if not @option_monday then
+      wdays = ['日', '月', '火', '水', '木', '金', '土']
+    else
+      wdays = ['月', '火', '水', '木', '金', '土', '日']
+    end
+    start_view_day = @start_day.beginning_of_month
+    end_view_day = @end_day.end_of_month
+  %>
+  <% while current_day < @end_day do %>
+    <tr>
+    <% for w in 0..6 do %>
+      <%
+        td_class = current_day.strftime('%A').downcase
+        if current_day == @today then
+          td_class += ' today'
+        end
+      %>
+      <td class="<%= td_class %>">
+        <div>
+        <% if start_view_day <= current_day && current_day <= end_view_day %>
+          <div class="date"><%= current_day.strftime('%-m/%-d') + ' (' + wdays[w] + ')' %></div>
+          <% if @calendar[current_day.strftime('%Y-%m-%d')] then %>
+            <%
+              events = @calendar[current_day.strftime('%Y-%m-%d')].sort { |a, b|
+                if a[:count] == b[:count] then
+                  a_limit = (a[:limit]) ? a[:limit] : 0
+                  b_limit = (b[:limit]) ? b[:limit] : 0
+                  b_limit <=> a_limit
+                else
+                  b[:count] <=> a[:count]
+                end
+              }
+            %>
+            <% events.each do |e| %>
+              <hr />
+              <%
+                event_class = 'event'
+                if e[:count] && e[:limit] && e[:limit] > 0 && e[:count] >= e[:limit] then
+                  event_class += ' full'
+                end
+              %>
+              <%
+              term = nil
+              if not e[:end] then
+                term = e[:start].strftime('%-H:%M') + '〜'
+              elsif e[:start].strftime('%Y%m%d') == e[:end].strftime('%Y%m%d') then
+                if e[:start].strftime('%-H:%M') == e[:end].strftime('%-H:%M')
+                  term = e[:start].strftime('%-H:%M') + '〜'
+                else
+                  term = e[:start].strftime('%-H:%M') + '〜' + e[:end].strftime('%-H:%M')
+                end
+              else
+                term = (e[:end].to_i - e[:start].to_i)/(60*60*24) + 1
+                if term <= 1 then
+                  term = e[:start].strftime('%-H:%M') + '〜' + e[:end].strftime('%-H:%M')
+                else
+                  term = term.to_s + '日間'
+                end
+
+              end
+              if term then
+                term = '（' + term + '）'
+              end
+
+              limit = e[:limit]
+              if limit.blank? then
+                limit = '-'
+              end
+              %>
+              <div class="<%= event_class %>">
+              <%= image_tag @icons[e[:type]], {:width => 12, :height => 12, :class => 'icon'} %>
+              <span class="info">
+                [<%= @area_name[e[:area]] %>]
+                <%= e[:count].to_s + '/' + limit.to_s %>人
+              </span><span class="term">
+              <%= term %>
+              </span>
+              <br />
+              <%
+                title = e[:title]
+                if e[:address] then
+                  title += ' / ' + e[:address]
+                end
+
+                options = {:title => title}
+
+                if @option_blank then
+                  options[:target] = '_blank'
+                end
+              %>
+              <%= link_to e[:title], e[:url], options  %><br />
+              <!-- owner_id : <%= e[:owner_id] %> -->
+            </div>
+            <% end %>
+          <% end %>
+        <% end %>
+        </div>
+      </td>
+      <% current_day = current_day + 1.days %>
+    <% end %>
+    </tr>
+  <% end %>
+</table>
+
+<div id="last-update">
+Last Update ：
+<% @site_name.each do |s, n| %>
+  <% if @updated[s] then %>
+  <%= ' ' + n + ' = ' + Time.parse(@updated[s]).strftime('%Y/%-m/%-d %H:%M') %>&nbsp;
+  <% end %>
+<% end %>
+</div>
+
+<% @debug_log.each do |log| %>
+<%= log %><br />
+<% end %>
