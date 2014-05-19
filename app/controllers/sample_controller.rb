@@ -115,7 +115,6 @@ class SampleController < ApplicationController
     calendar(AREA_KANTO)
   end
   def hokkaido_tohoku
-    calendar(AREA_HOKKAIDO_TOHOKU)
     render 'index'
   end
   def kanto
@@ -154,50 +153,44 @@ class SampleController < ApplicationController
     end_day   = today + (MAX_MONTHS - 1).month
 
     events = nil
-    [TYPE_ATND, TYPE_ATND, TYPE_ATND, TYPE_ZUSAAR, TYPE_CONNPASS, TYPE_CONNPASS, TYPE_CONNPASS, TYPE_DOORKEEPER].shuffle.each do |type|
 
-      case type
-      when TYPE_ATND
-        AREA_CATEGORIES.keys.shuffle.each do |area_category, tmp|
-          updated, events, clear_flag = get_events(type, area_category, start_day, end_day, check_expire = false)
-          if clear_flag then
-            msg += 'ATND(' + area_category.to_s + ') '
-            break
-          end
-        end
-
-      when TYPE_ZUSAAR
-        updated, events, clear_flag = get_events(type, nil, start_day, end_day, true)
-        if clear_flag then
-          msg += 'Zusaar '
-          break
-        end
-
-      when TYPE_CONNPASS
-        AREA_CATEGORIES.keys.shuffle.each do |area_category, tmp|
-          updated, events, clear_flag = get_events(type, area_category, start_day, end_day, true)
-          if clear_flag then
-            msg += 'connpass(' + area_category.to_s + ') '
-            break
-          end
-        end
-
-      when TYPE_DOORKEEPER
-        updated, events, clear_flag = get_events(type, nil, start_day, end_day, true)
-        if clear_flag then
-          msg += 'Dookeeper '
-          break
-        end
-      end
-
-      if events then
-          msg = 'update : ' + msg
-        break
-      end
-
+    type = params[:type].to_i
+    area_category = nil
+    if params[:area_category] then
+      area_category = params[:area_category].to_i
     end
 
-    if msg == '' then
+    case type
+    when TYPE_ATND
+      updated, events, clear_flag = get_events(type, area_category, start_day, end_day, false)
+      if clear_flag then
+        msg += 'ATND(' + area_category.to_s + ') '
+      end
+
+    when TYPE_ZUSAAR
+      updated, events, clear_flag = get_events(type, nil, start_day, end_day, true)
+      if clear_flag then
+        msg += 'Zusaar '
+      end
+
+    when TYPE_CONNPASS
+      if params[:area_category] then
+        updated, events, clear_flag = get_events(type, area_category, start_day, end_day, true)
+        if clear_flag then
+          msg += 'connpass(' + area_category.to_s + ') '
+        end
+      end
+
+    when TYPE_DOORKEEPER
+      updated, events, clear_flag = get_events(type, nil, start_day, end_day, true)
+      if clear_flag then
+        msg += 'Dookeeper '
+      end
+    end
+
+    if events then
+      msg = 'update : ' + msg
+    else
       msg = 'no update'
     end
 

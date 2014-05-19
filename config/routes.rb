@@ -14,7 +14,7 @@ Itcal::Application.routes.draw do
   get '/kansai'           => 'sample#kansai'
   get '/chugoku_shikoku'  => 'sample#chugoku_shikoku'
   get '/kyushu_okinawa'   => 'sample#kyushu_okinawa'
-  get '/update_cache'     => 'sample#update_cache'
+  get '/update_cache/:type(/:area_category)' => 'sample#update_cache'
   get '/clear_cache'     => 'sample#clear_cache'
 
   # Example of named route that can be invoked with purchase_url(id: product.id)
