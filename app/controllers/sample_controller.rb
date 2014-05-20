@@ -115,6 +115,7 @@ class SampleController < ApplicationController
     calendar(AREA_KANTO)
   end
   def hokkaido_tohoku
+    calendar(AREA_HOKKAIDO_TOHOKU)
     render 'index'
   end
   def kanto
