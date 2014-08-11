@@ -16,7 +16,7 @@ module Cache
   # キャッシュの書き込み
   #
   def cache_write(key, data)
-    return Rails.cache.write(key, {:updated => Time.now.to_s, :data => data}, :expires_in => 1.days)
+    return Rails.cache.write(key, {:updated => Time.now.to_s, :data => data}, :expires_in => 7.days)
   end
 
 end

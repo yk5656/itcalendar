@@ -132,13 +132,13 @@ class SampleController < ApplicationController
 
     events.each do |e|
 
-      #if not e[:area] then
-      #  next
-      #end
+      if not e[:area] then
+        next
+      end
 
-      #if not target_areas[e[:area]] then
-      #  next
-      #end
+      if not target_areas[e[:area]] then
+        next
+      end
 
       if e[:count] < min_count then
         next
