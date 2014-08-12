@@ -2,6 +2,9 @@ require "open-uri"
 require "time"
 require "active_support"
 
+require "Event"
+require "Cache"
+require "Util"
 include Event
 include Cache
 include Util

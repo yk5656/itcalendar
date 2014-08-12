@@ -1,3 +1,7 @@
+require "Event"
+require "Address"
+require "Cache"
+require "Util"
 include Event
 include Address
 include Cache
@@ -39,6 +43,7 @@ class Update
   # zusaar
   #
   def self.zusaar()
+    puts $LOAD_PATH
     puts "zusaar開始"
 
     start_day, end_day = get_period()
@@ -103,6 +108,12 @@ class Update
     puts "doorkeeper終了"
   end
 
+  #
+  # キャッシュクリア
+  #
+  def self.clear()
+
+  end
 
   private
 
@@ -153,12 +164,18 @@ class Update
       end
     end
 
+    filterd_count = 0
     events.each do |event|
-      if event[:area] && event[:count] > 0 then
-        category = area_to_category[event[:area]]
-        classified_events[category].push(event)
+      if event[:area] then
+        if event[:count] > 0 then
+          category = area_to_category[event[:area]]
+          classified_events[category].push(event)
+        else
+          filterd_count += 1
+        end
       end
     end
+    puts filterd_count.to_s + "件除外"
 
     return classified_events
   end
