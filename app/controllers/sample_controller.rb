@@ -87,7 +87,7 @@ class SampleController < ApplicationController
       next if not option_sites[type]
 
       updated[type], classified_events = cache_read(SITE_NAME[type])
-      if classified_events[area_category] then
+      if classified_events && classified_events[area_category] then
         events = classified_events[area_category]
       else
         events = []

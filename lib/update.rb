@@ -43,7 +43,6 @@ class Update
   # zusaar
   #
   def self.zusaar()
-    puts $LOAD_PATH
     puts "zusaar開始"
 
     start_day, end_day = get_period()
