@@ -7,24 +7,24 @@
     width: 100%;
   }
   th {
-    background-color: #ddd;
+    background-color: #ccc;
   }
   th.sunday {
-    background-color: #fdd;
+    background-color: #fcc;
     color: #b00;
   }
   th.saturday {
-    background-color: #ddf;
+    background-color: #ccf;
     color: #00b;
   }
   .table-bordered>tbody>tr>th.weekday {
-    border-color: #ddd #eee #ddd #eee;
+    border-color: #ccc #ddd #ccc #ddd;
   }
   .table-bordered>tbody>tr>th.sunday {
-    border-color: #fdd;
+    border-color: #fcc #ddd #fcc #ddd;
   }
   .table-bordered>tbody>tr>th.saturday {
-    border-color: #ddf;
+    border-color: #ccf #ddd #ccf #ddd;
   }
   td div {
     overflow: hidden;
@@ -106,23 +106,23 @@
   }
   $(function(){
     $("#link-monday-off").click(function(){ $.removeCookie('m');  refresh() });
-    $("#link-monday-on").click(function(){  $.cookie('m', 1);     refresh() });
+    $("#link-monday-on").click(function(){  $.cookie('m', 1, {'expires':365});     refresh() });
     $("#link-filter").click(function(){
       var area = new Array()
       <% @area_name.each do |a, n| %>
       if ($('#a' + <%= a %>).is(':checked')) area.push(<%= a %>);
       <% end %>
-      $.cookie('a' + <%= @area_category %>, area.join(','));
+      $.cookie('a' + <%= @area_category %>, area.join(','), {'expires':365});
 
       var site = new Array();
       <% @site_name.each do |s, n| %>
       if ($('#s' + <%= s %>).is(':checked')) site.push(<%= s %>);
       <% end %>
-      $.cookie('s', site.join(','));
+      $.cookie('s', site.join(','), {'expires':365});
 
-      $.cookie('c', $('#select-count').val());
-      $.cookie('l', $('#select-limit').val());
-      $.cookie('f', ($('#checkbox-full').is(':checked')) ? 1 : 0);
+      $.cookie('c', $('#select-count').val(), {'expires':365});
+      $.cookie('l', $('#select-limit').val(), {'expires':365});
+      $.cookie('f', ($('#checkbox-full').is(':checked')) ? 1 : 0, {'expires':365});
 
       refresh();
     })
