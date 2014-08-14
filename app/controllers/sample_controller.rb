@@ -79,7 +79,7 @@ class SampleController < ApplicationController
 
     today = Date.today
     start_day = today
-    end_day   = today + MAX_MONTHS.month - 2.week
+    end_day   = (today + MAX_MONTHS.month - 2.week).end_of_week
 
     calendar = {}
     updated = {}
