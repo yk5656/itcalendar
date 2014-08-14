@@ -7,15 +7,24 @@
     width: 100%;
   }
   th {
-    background-color: #eee;
+    background-color: #ddd;
   }
   th.sunday {
-    background-color: #fee;
+    background-color: #fdd;
     color: #b00;
   }
   th.saturday {
-    background-color: #eef;
+    background-color: #ddf;
     color: #00b;
+  }
+  .table-bordered>tbody>tr>th.weekday {
+    border-color: #ddd #eee #ddd #eee;
+  }
+  .table-bordered>tbody>tr>th.sunday {
+    border-color: #fdd;
+  }
+  .table-bordered>tbody>tr>th.saturday {
+    border-color: #ddf;
   }
   td div {
     overflow: hidden;
@@ -221,7 +230,7 @@
     <div style="font-size:small">
       <b>information</b>
       <hr>
-      2014/08/10 alpha版作成<br />
+      2014/08/14 公開<br />
     </div>
   </div>
 </div>
@@ -232,18 +241,18 @@
   <tr>
     <% if not @option_monday then %>
     <th class="sunday">日</th>
-    <th>月</th>
-    <th>火</th>
-    <th>水</th>
-    <th>木</th>
-    <th>金</th>
+    <th class="weekday">月</th>
+    <th class="weekday">火</th>
+    <th class="weekday">水</th>
+    <th class="weekday">木</th>
+    <th class="weekday">金</th>
     <th class="saturday">土</th>
     <% else %>
-    <th>月</th>
-    <th>火</th>
-    <th>水</th>
-    <th>木</th>
-    <th>金</th>
+    <th class="weekday">月</th>
+    <th class="weekday">火</th>
+    <th class="weekday">水</th>
+    <th class="weekday">木</th>
+    <th class="weekday">金</th>
     <th class="saturday">土</th>
     <th class="sunday">日</th>
     <% end %>
