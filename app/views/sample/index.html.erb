@@ -93,10 +93,11 @@
   #filter-form {
     margin-left: 15px;
   }
+  #footer {
+      font-size: x-small;
+  }
   #last-update {
     text-align: right;
-    font-size: x-small;
-    
   }
   .nav>li>a.week_start {
       line-height: 14px;
@@ -139,7 +140,7 @@
   <div class="container-fluid">
     <div class="navbar-header">
       <span class="navbar-brand" style="color:#fff">
-        <%= image_tag "logo.png", {:width => 150, :height => 24, :style => "vertical-align:top"} %>
+        <%= image_tag "logo.png", {:width => 150, :height => 24, :style => "vertical-align:bottom"} %> <small>(</small>α<small>版)</small>
       </span>
     </div>
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -378,13 +379,20 @@
   <% end %>
 </table>
 
-<div id="last-update">
-Last Update ：
-<% @site_name.each do |s, n| %>
-  <% if @updated[s] then %>
-  <%= ' ' + n + ' = ' + Time.parse(@updated[s]).strftime('%Y/%-m/%-d %H:%M') %>&nbsp;
-  <% end %>
-<% end %>
+<div id="footer" class="row">
+  <div class="col-md-6">
+    &nbsp;何かありましたら<a target="_blank" href="https://twitter.com/yk5656">こちら</a>まで
+  </div>
+  <div class="col-md-6">
+    <div id="last-update">
+      Last Update ：
+      <% @site_name.each do |s, n| %>
+          <% if @updated[s] then %>
+              <%= ' ' + n + ' = ' + Time.parse(@updated[s]).strftime('%Y/%-m/%-d %H:%M') %>&nbsp;
+          <% end %>
+      <% end %>
+    </div>
+  </div>
 </div>
 
 <% @debug_log.each do |log| %>
