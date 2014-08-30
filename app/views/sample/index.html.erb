@@ -27,7 +27,10 @@
     border-color: #ccf #ddd #ccf #ddd;
   }
   .table-bordered>tbody>tr>td {
-    border: 1px solid #ccc;
+    border-top: 1px solid #fff;
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
   }
   td div {
     overflow: hidden;
@@ -107,6 +110,9 @@
   .nav>li>a.week_start small{
       font-size: xx-small;
   }
+  .fixed{
+      position:fixed;
+  }
 </style>
 <script>
   function refresh() {
@@ -133,7 +139,19 @@
       $.cookie('f', ($('#checkbox-full').is(':checked')) ? 1 : 0, {'expires':365});
 
       refresh();
-    })
+    });
+
+    // カレンダーのヘッダーの追従
+    var nav = $('#week_nav');
+    var navTop = nav.offset().top;
+    $(window).scroll(function () {
+        var winTop = $(this).scrollTop();
+        if (winTop >= navTop) {
+            nav.addClass('fixed').css('top',0);
+        } else if (winTop < navTop) {
+            nav.removeClass('fixed').css('top',-navTop+'px');
+        }
+    });
   });
 </script>
 <nav class="navbar navbar-inverse navbar-static-top" role="navigation">
@@ -245,26 +263,28 @@
 
 <br />
 
-<table class="table table-bordered table-condensed">
+<table id="week_nav" class="table table-bordered table-condensed">
   <tr>
     <% if not @option_monday then %>
-    <th class="sunday">日</th>
-    <th class="weekday">月</th>
-    <th class="weekday">火</th>
-    <th class="weekday">水</th>
-    <th class="weekday">木</th>
-    <th class="weekday">金</th>
-    <th class="saturday">土</th>
+        <th class="sunday">日</th>
+        <th class="weekday">月</th>
+        <th class="weekday">火</th>
+        <th class="weekday">水</th>
+        <th class="weekday">木</th>
+        <th class="weekday">金</th>
+        <th class="saturday">土</th>
     <% else %>
-    <th class="weekday">月</th>
-    <th class="weekday">火</th>
-    <th class="weekday">水</th>
-    <th class="weekday">木</th>
-    <th class="weekday">金</th>
-    <th class="saturday">土</th>
-    <th class="sunday">日</th>
+        <th class="weekday">月</th>
+        <th class="weekday">火</th>
+        <th class="weekday">水</th>
+        <th class="weekday">木</th>
+        <th class="weekday">金</th>
+        <th class="saturday">土</th>
+        <th class="sunday">日</th>
     <% end %>
   </tr>
+</table>
+<table class="table table-bordered table-condensed">
   <%
     if not @option_monday then
       current_day = @start_day - @start_day.wday.days
